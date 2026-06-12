@@ -97,14 +97,14 @@ vercel
 - 정적 UI: `public/` (빌드 없이 Git에 포함)
 - 챗봇 API: `api/chat.py` (서버리스)
 
-> Vercel 배포본에서는 **챗봇 + 정적 UI**만 동작합니다. 뉴스 검색·이메일은 로컬 FastAPI 서버에서 사용하세요.
+- Vercel 배포본: **이슈 검색 + AI 챗봇** (이메일 발송은 미지원)
 
 ## API
 
 | Method | Path | 설명 |
 |--------|------|------|
 | GET | `/api/examples` | 예시 키워드 목록 |
-| POST | `/api/search` | `{ "keyword": "..." }` — 이슈 수집 및 보고서 생성 |
+| POST | `/api/search` | `{ "keyword": "..." }` — 이슈 수집 및 보고서 생성 (Vercel 지원) |
 | POST | `/api/send-email` | `{ "keyword": "...", "email": "..." }` — 이메일 발송 |
 | GET | `/api/chat/status` | Gemini API 키 설정 여부 |
 | POST | `/api/chat` | `{ "messages": [...], "keyword": "...", "report_context": "..." }` — AI 챗봇 |
@@ -124,7 +124,10 @@ issue-report-app/
 │   ├── index.html
 │   └── static/
 ├── api/
-│   └── chat.py                 # Vercel 서버리스 챗봇
+│   ├── search.py               # Vercel 이슈 검색
+│   ├── examples.py             # Vercel 예시 키워드
+│   ├── chat.py                 # Vercel AI 챗봇
+│   └── email/status.py         # Vercel 이메일 상태 (미지원 안내)
 └── frontend/                   # (선택) React + Vite 버전
 ```
 

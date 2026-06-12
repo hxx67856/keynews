@@ -19,6 +19,7 @@ from services.email_sender import send_report_email, verify_smtp_login
 from services.gemini_chat import GEMINI_MODEL, generate_chat_reply, is_gemini_configured
 from services.news_collector import collect_issues
 from services.report_store import create_report, get_report_file_path, get_report_meta
+from services.search_service import execute_search
 from services.summarizer import build_report
 
 load_dotenv()
@@ -130,31 +131,12 @@ async def chat(req: ChatRequest) -> dict[str, str]:
 
 @app.post("/api/search")
 async def search(req: SearchRequest) -> dict[str, Any]:
-    keyword = req.keyword.strip()
-    if not keyword:
-        raise HTTPException(status_code=400, detail="키워드를 입력해 주세요.")
-
     try:
-        items = await collect_issues(keyword)
+        return await execute_search(req.keyword)
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
     except Exception as exc:
         raise HTTPException(status_code=502, detail=f"뉴스 수집 실패: {exc}") from exc
-
-    report = build_report(keyword, items)
-    generated_at = datetime.now(KST).strftime("%Y-%m-%d %H:%M KST")
-    report_files = create_report(keyword, report, generated_at)
-
-    return {
-        "keyword": keyword,
-        "period_days": 7,
-        "generated_at": generated_at,
-        "item_count": len(items),
-        "three_line_summary": report["three_line_summary"],
-        "overview": report["overview"],
-        "highlights": report["highlights"],
-        "sources": report["sources"],
-        "items": items,
-        **report_files,
-    }
 
 
 @app.get("/api/reports/{report_id}")

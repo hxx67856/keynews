@@ -14,6 +14,7 @@ const emailHintEl = $('#email-hint');
 let currentKeyword = '';
 let currentReportId = '';
 let currentReportContext = '';
+let currentReportHtml = '';
 let emailConfigured = false;
 
 window.issueBriefingKeyword = '';
@@ -54,11 +55,13 @@ async function fetchEmailStatus() {
     } else {
       emailHintEl.textContent = data.message || 'SMTP 설정이 필요합니다. backend/.env 파일을 확인하세요.';
       emailHintEl.classList.remove('hidden');
+      emailBtn.disabled = true;
     }
   } catch {
     if (emailHintEl) {
       emailHintEl.textContent = '이메일 설정 상태를 확인하지 못했습니다.';
       emailHintEl.classList.remove('hidden');
+      emailBtn.disabled = true;
     }
   }
 }
@@ -90,13 +93,16 @@ function renderExamples(keywords) {
 }
 
 function renderResults(data) {
-  if (!data.report_url) {
+  const hasReport = data.report_url || data.report_html;
+  if (!hasReport) {
     resultsEl.innerHTML = `
       <div class="alert alert-error">보고서를 생성하지 못했습니다. 다시 검색해 주세요.</div>
     `;
     resultsEl.classList.remove('hidden');
     return;
   }
+
+  currentReportHtml = data.report_html || '';
 
   resultsEl.innerHTML = `
     <div class="meta-bar">
@@ -110,17 +116,48 @@ function renderResults(data) {
       <div class="report-embed-header">
         <p class="card-label">이슈 브리핑 보고서</p>
         <div class="report-embed-actions">
-          <a class="src-link" href="${escapeHtml(data.report_url)}" target="_blank" rel="noopener noreferrer">새 탭</a>
-          <a class="src-link" href="${escapeHtml(data.report_download_url)}" download>다운로드</a>
+          <a class="src-link" id="report-open-link" href="${escapeHtml(data.report_url || '#')}" target="_blank" rel="noopener noreferrer">새 탭</a>
+          <a class="src-link" id="report-download-link" href="${escapeHtml(data.report_download_url || '#')}" ${data.report_download_url ? 'download' : ''}>다운로드</a>
         </div>
       </div>
       <iframe
         class="report-frame"
-        src="${escapeHtml(data.report_url)}"
         title="${escapeHtml(data.keyword)} 이슈 보고서"
       ></iframe>
     </article>
   `;
+
+  const iframe = resultsEl.querySelector('.report-frame');
+  if (currentReportHtml && iframe) {
+    iframe.srcdoc = currentReportHtml;
+    const openLink = resultsEl.querySelector('#report-open-link');
+    const downloadLink = resultsEl.querySelector('#report-download-link');
+    if (openLink) {
+      openLink.href = '#';
+      openLink.addEventListener('click', (e) => {
+        e.preventDefault();
+        const blob = new Blob([currentReportHtml], { type: 'text/html;charset=utf-8' });
+        window.open(URL.createObjectURL(blob), '_blank', 'noopener,noreferrer');
+      });
+    }
+    if (downloadLink) {
+      downloadLink.href = '#';
+      downloadLink.removeAttribute('download');
+      downloadLink.addEventListener('click', (e) => {
+        e.preventDefault();
+        const blob = new Blob([currentReportHtml], { type: 'text/html;charset=utf-8' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `issue-briefing-${data.keyword}.html`;
+        a.click();
+        URL.revokeObjectURL(url);
+      });
+    }
+  } else if (iframe && data.report_url) {
+    iframe.src = data.report_url;
+  }
+
   resultsEl.classList.remove('hidden');
 }
 
