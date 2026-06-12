@@ -98,6 +98,24 @@ function renderResults(data) {
     (line) => `<li class="summary-line">${escapeHtml(line)}</li>`
   ).join('') || '<li class="summary-line">요약을 생성하지 못했습니다. 다시 검색해 주세요.</li>';
 
+  const reportEmbed = data.report_url ? `
+    <article class="card-base report-embed">
+      <div class="report-embed-header">
+        <p class="card-label">보고서</p>
+        <div class="report-embed-actions">
+          <a class="src-link" href="${escapeHtml(data.report_url)}" target="_blank" rel="noopener noreferrer">새 탭</a>
+          <a class="src-link" href="${escapeHtml(data.report_download_url)}" download>다운로드</a>
+        </div>
+      </div>
+      <iframe
+        class="report-frame"
+        src="${escapeHtml(data.report_url)}"
+        title="${escapeHtml(data.keyword)} 이슈 보고서"
+        loading="lazy"
+      ></iframe>
+    </article>
+  ` : '';
+
   resultsEl.innerHTML = `
     <div class="meta-bar">
       <span class="badge-tag badge-tag-purple">키워드: ${escapeHtml(data.keyword)}</span>
@@ -106,19 +124,12 @@ function renderResults(data) {
       <span class="badge-tag badge-tag-sky">${escapeHtml(data.generated_at)}</span>
     </div>
 
-    <article class="card-base report-ready">
-      <p class="card-label">보고서 생성 완료</p>
-      <p class="overview-text">「${escapeHtml(data.keyword)}」 이슈 보고서가 자동 생성되었습니다.</p>
-      <div class="report-actions">
-        <a class="btn-primary report-action-btn" href="${escapeHtml(data.report_url)}" target="_blank" rel="noopener noreferrer">보고서 보기</a>
-        <a class="btn-secondary report-action-btn" href="${escapeHtml(data.report_download_url)}" download>HTML 다운로드</a>
-      </div>
-    </article>
-
     <article class="card-yellow-bold">
       <p class="card-label">세 줄 요약</p>
       <ol class="three-line-summary">${summaryLines}</ol>
     </article>
+
+    ${reportEmbed}
 
     <article class="card-base">
       <p class="card-label">핵심 개요</p>

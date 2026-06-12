@@ -193,19 +193,6 @@ export default function App() {
               <span className="badge-tag badge-tag-sky">{result.generated_at}</span>
             </div>
 
-            <article className="card-base report-ready">
-              <p className="card-label">보고서 생성 완료</p>
-              <p className="overview-text">「{result.keyword}」 이슈 보고서가 자동 생성되었습니다.</p>
-              <div className="report-actions">
-                <a className="btn-primary report-action-btn" href={result.report_url} target="_blank" rel="noopener noreferrer">
-                  보고서 보기
-                </a>
-                <a className="btn-secondary report-action-btn" href={result.report_download_url} download>
-                  HTML 다운로드
-                </a>
-              </div>
-            </article>
-
             <article className="card-yellow-bold">
               <p className="card-label">세 줄 요약</p>
               <ol className="three-line-summary">
@@ -214,6 +201,24 @@ export default function App() {
                 ))}
               </ol>
             </article>
+
+            {result.report_url && (
+              <article className="card-base report-embed">
+                <div className="report-embed-header">
+                  <p className="card-label">보고서</p>
+                  <div className="report-embed-actions">
+                    <a className="src-link" href={result.report_url} target="_blank" rel="noopener noreferrer">새 탭</a>
+                    <a className="src-link" href={result.report_download_url} download>다운로드</a>
+                  </div>
+                </div>
+                <iframe
+                  className="report-frame"
+                  src={result.report_url}
+                  title={`${result.keyword} 이슈 보고서`}
+                  loading="lazy"
+                />
+              </article>
+            )}
 
             <article className="card-base">
               <p className="card-label">핵심 개요</p>
