@@ -15,7 +15,7 @@ from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, EmailStr, Field
 
 from services.email_config import email_setup_hint, is_email_configured
-from services.email_sender import send_report_email
+from services.email_sender import send_report_email, verify_smtp_login
 from services.news_collector import collect_issues
 from services.report_store import create_report, get_report_file_path, get_report_meta
 from services.summarizer import build_report
@@ -78,6 +78,17 @@ async def email_status() -> dict[str, str | bool]:
         "configured": configured,
         "message": email_setup_hint(),
     }
+
+
+@app.post("/api/email/test")
+async def email_test() -> dict[str, str]:
+    try:
+        await verify_smtp_login()
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    except Exception as exc:
+        raise HTTPException(status_code=502, detail=f"SMTP 연결 실패: {exc}") from exc
+    return {"message": "Gmail SMTP 인증 성공. 이메일 발송을 사용할 수 있습니다."}
 
 
 @app.post("/api/search")
@@ -155,7 +166,13 @@ async def send_email(req: EmailRequest) -> dict[str, str]:
     except ValueError as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
     except Exception as exc:
-        raise HTTPException(status_code=502, detail=f"이메일 발송 실패: {exc}") from exc
+        detail = str(exc)
+        if "535" in detail or "BadCredentials" in detail:
+            detail = (
+                "Gmail 인증 실패: 앱 비밀번호를 새로 생성해 backend/.env 에 입력하세요. "
+                "https://myaccount.google.com/apppasswords"
+            )
+        raise HTTPException(status_code=502, detail=f"이메일 발송 실패: {detail}") from exc
 
     return {"message": f"{req.email}로 보고서를 발송했습니다."}
 

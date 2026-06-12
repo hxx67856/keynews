@@ -41,7 +41,19 @@ cd backend
 
 | 증상 | 해결 |
 |------|------|
+| **535 BadCredentials** | 앱 비밀번호 **재생성** 후 `.env` 갱신 (일반 비밀번호 불가) |
 | SMTP 설정이 없습니다 | `.env` 파일 경로·값 확인 후 서버 재시작 |
-| Authentication failed | 앱 비밀번호 사용 여부 확인 (일반 Gmail 비밀번호 X) |
-| 2단계 인증 없음 | Google 계정에서 2단계 인증 먼저 활성화 |
+| Authentication failed | 2단계 인증 활성화 여부 확인 |
 | 메일이 스팸함으로 | 정상 동작 시에도 스팸함 확인 |
+
+### 535 오류일 때 (가장 흔함)
+
+1. [앱 비밀번호](https://myaccount.google.com/apppasswords) 페이지에서 **기존 비밀번호 삭제**
+2. **새 앱 비밀번호** 생성 (16자리)
+3. `backend/.env` 의 `SMTP_PASSWORD=` 에 붙여넣기
+4. 서버 재시작
+5. http://localhost:8000/api/email/test 로 인증 테스트 (POST)
+
+```bash
+curl -X POST http://localhost:8000/api/email/test
+```
