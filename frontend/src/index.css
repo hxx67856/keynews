@@ -324,11 +324,20 @@ a:hover { text-decoration: underline; }
 }
 .report-embed-header .card-label { margin-bottom: 0; }
 .report-embed-actions { display: flex; gap: 16px; font-size: 13px; }
+.report-embed-main { flex: 1; }
+
+.results {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-height: calc(100vh - 360px);
+}
+
 .report-frame {
   display: block;
   width: 100%;
-  min-height: 720px;
-  height: 75vh;
+  min-height: 800px;
+  height: calc(100vh - 320px);
   border: none;
   background: var(--canvas);
 }

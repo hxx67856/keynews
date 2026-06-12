@@ -6,8 +6,6 @@ import {
   type SearchResult,
 } from './api'
 
-const TINT_CLASSES = ['tint-peach', 'tint-rose', 'tint-mint', 'tint-lavender', 'tint-sky', 'tint-yellow']
-
 export default function App() {
   const [keyword, setKeyword] = useState('')
   const [email, setEmail] = useState('')
@@ -108,8 +106,7 @@ export default function App() {
           <span className="badge-purple">Issue Briefing</span>
           <h1 className="hero-title">키워드 이슈를<br />한눈에 파악하세요</h1>
           <p className="hero-subtitle">
-            키워드를 입력하면 최근 7일 이내 주요 이슈를 자동 수집하고,
-            한 줄 요약과 핵심 내용을 정리해 드립니다.
+            키워드를 입력하면 최근 7일 이내 주요 이슈를 자동 수집하고, HTML 보고서를 생성해 드립니다.
           </p>
         </div>
 
@@ -193,19 +190,10 @@ export default function App() {
               <span className="badge-tag badge-tag-sky">{result.generated_at}</span>
             </div>
 
-            <article className="card-yellow-bold">
-              <p className="card-label">세 줄 요약</p>
-              <ol className="three-line-summary">
-                {result.three_line_summary.map((line, i) => (
-                  <li key={i} className="summary-line">{line}</li>
-                ))}
-              </ol>
-            </article>
-
-            {result.report_url && (
-              <article className="card-base report-embed">
+            {result.report_url ? (
+              <article className="card-base report-embed report-embed-main">
                 <div className="report-embed-header">
-                  <p className="card-label">보고서</p>
+                  <p className="card-label">이슈 브리핑 보고서</p>
                   <div className="report-embed-actions">
                     <a className="src-link" href={result.report_url} target="_blank" rel="noopener noreferrer">새 탭</a>
                     <a className="src-link" href={result.report_download_url} download>다운로드</a>
@@ -215,63 +203,11 @@ export default function App() {
                   className="report-frame"
                   src={result.report_url}
                   title={`${result.keyword} 이슈 보고서`}
-                  loading="lazy"
                 />
               </article>
+            ) : (
+              <div className="alert alert-error">보고서를 생성하지 못했습니다. 다시 검색해 주세요.</div>
             )}
-
-            <article className="card-base">
-              <p className="card-label">핵심 개요</p>
-              <p className="overview-text">{result.overview}</p>
-            </article>
-
-            <section>
-              <h2 className="section-heading">
-                주요 이슈 <span style={{ fontSize: 18, color: 'var(--steel)' }}>{result.highlights.length}건</span>
-              </h2>
-              <div className="highlight-list">
-                {result.highlights.map((item, i) => (
-                  <div key={item.rank} className={`highlight-item ${TINT_CLASSES[i % TINT_CLASSES.length]}`}>
-                    <span className="badge-tag badge-tag-purple">#{item.rank}</span>
-                    <h3>
-                      <a className="title-link" href={item.url} target="_blank" rel="noopener noreferrer">
-                        {item.title}
-                      </a>
-                    </h3>
-                    <p>{item.key_point}</p>
-                    <div className="source-tag">
-                      <span className="source-date">{item.date_short}</span>
-                      <a className="src-link" href={item.url} target="_blank" rel="noopener noreferrer">
-                        {item.link_label}
-                      </a>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </section>
-
-            <article className="card-base">
-              <p className="card-label">출처 목록</p>
-              <ol className="comparison-table">
-                {result.sources.map((src) => (
-                  <li key={src.index} className="comparison-row">
-                    <span className="src-num">{src.index}</span>
-                    <div className="src-body">
-                      <span className="src-title">{src.title}</span>
-                      <span className="src-ref">
-                        {src.date_short}
-                        <a className="src-link" href={src.url} target="_blank" rel="noopener noreferrer">
-                          {src.link_label}
-                        </a>
-                      </span>
-                      <a className="src-url" href={src.url} target="_blank" rel="noopener noreferrer">
-                        {src.url_short}
-                      </a>
-                    </div>
-                  </li>
-                ))}
-              </ol>
-            </article>
           </div>
         )}
       </main>

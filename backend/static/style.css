@@ -423,7 +423,8 @@ a:hover { text-decoration: underline; }
 .results {
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-lg);
+  gap: var(--spacing-md);
+  min-height: calc(100vh - 360px);
 }
 
 .section-heading {
@@ -525,11 +526,15 @@ a:hover { text-decoration: underline; }
   font-size: 13px;
 }
 
+.report-embed-main {
+  flex: 1;
+}
+
 .report-frame {
   display: block;
   width: 100%;
-  min-height: 720px;
-  height: 75vh;
+  min-height: 800px;
+  height: calc(100vh - 320px);
   border: none;
   background: var(--canvas);
 }

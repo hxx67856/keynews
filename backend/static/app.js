@@ -10,8 +10,6 @@ const alertEl = $('#alert');
 const loadingEl = $('#loading');
 const resultsEl = $('#results');
 
-const TINT_CLASSES = ['tint-peach', 'tint-rose', 'tint-mint', 'tint-lavender', 'tint-sky', 'tint-yellow'];
-
 let currentKeyword = '';
 let currentReportId = '';
 
@@ -65,56 +63,13 @@ function renderExamples(keywords) {
 }
 
 function renderResults(data) {
-  const highlights = data.highlights.map((item, i) => {
-    const tint = TINT_CLASSES[i % TINT_CLASSES.length];
-    return `
-    <div class="highlight-item ${tint}">
-      <span class="badge-tag badge-tag-purple">#${item.rank}</span>
-      <h3><a class="title-link" href="${escapeHtml(item.url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(item.title)}</a></h3>
-      <p>${escapeHtml(item.key_point)}</p>
-      <div class="source-tag">
-        <span class="source-date">${escapeHtml(item.date_short)}</span>
-        <a class="src-link" href="${escapeHtml(item.url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(item.link_label)}</a>
-      </div>
-    </div>
-  `;
-  }).join('');
-
-  const sources = data.sources.map((src) => `
-    <li class="comparison-row">
-      <span class="src-num">${src.index}</span>
-      <div class="src-body">
-        <span class="src-title">${escapeHtml(src.title)}</span>
-        <span class="src-ref">
-          ${escapeHtml(src.date_short)}
-          <a class="src-link" href="${escapeHtml(src.url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(src.link_label)}</a>
-        </span>
-        <a class="src-url" href="${escapeHtml(src.url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(src.url_short)}</a>
-      </div>
-    </li>
-  `).join('');
-
-  const summaryLines = (data.three_line_summary || []).map(
-    (line) => `<li class="summary-line">${escapeHtml(line)}</li>`
-  ).join('') || '<li class="summary-line">요약을 생성하지 못했습니다. 다시 검색해 주세요.</li>';
-
-  const reportEmbed = data.report_url ? `
-    <article class="card-base report-embed">
-      <div class="report-embed-header">
-        <p class="card-label">보고서</p>
-        <div class="report-embed-actions">
-          <a class="src-link" href="${escapeHtml(data.report_url)}" target="_blank" rel="noopener noreferrer">새 탭</a>
-          <a class="src-link" href="${escapeHtml(data.report_download_url)}" download>다운로드</a>
-        </div>
-      </div>
-      <iframe
-        class="report-frame"
-        src="${escapeHtml(data.report_url)}"
-        title="${escapeHtml(data.keyword)} 이슈 보고서"
-        loading="lazy"
-      ></iframe>
-    </article>
-  ` : '';
+  if (!data.report_url) {
+    resultsEl.innerHTML = `
+      <div class="alert alert-error">보고서를 생성하지 못했습니다. 다시 검색해 주세요.</div>
+    `;
+    resultsEl.classList.remove('hidden');
+    return;
+  }
 
   resultsEl.innerHTML = `
     <div class="meta-bar">
@@ -124,26 +79,19 @@ function renderResults(data) {
       <span class="badge-tag badge-tag-sky">${escapeHtml(data.generated_at)}</span>
     </div>
 
-    <article class="card-yellow-bold">
-      <p class="card-label">세 줄 요약</p>
-      <ol class="three-line-summary">${summaryLines}</ol>
-    </article>
-
-    ${reportEmbed}
-
-    <article class="card-base">
-      <p class="card-label">핵심 개요</p>
-      <p class="overview-text">${escapeHtml(data.overview)}</p>
-    </article>
-
-    <section>
-      <h2 class="section-heading">주요 이슈 <span style="font-size:18px;color:var(--steel)">${data.highlights.length}건</span></h2>
-      <div class="highlight-list">${highlights || '<p class="overview-text">수집된 이슈가 없습니다.</p>'}</div>
-    </section>
-
-    <article class="card-base">
-      <p class="card-label">출처 목록</p>
-      <ol class="sources-list comparison-table">${sources || '<li class="comparison-row">출처 없음</li>'}</ol>
+    <article class="card-base report-embed report-embed-main">
+      <div class="report-embed-header">
+        <p class="card-label">이슈 브리핑 보고서</p>
+        <div class="report-embed-actions">
+          <a class="src-link" href="${escapeHtml(data.report_url)}" target="_blank" rel="noopener noreferrer">새 탭</a>
+          <a class="src-link" href="${escapeHtml(data.report_download_url)}" download>다운로드</a>
+        </div>
+      </div>
+      <iframe
+        class="report-frame"
+        src="${escapeHtml(data.report_url)}"
+        title="${escapeHtml(data.keyword)} 이슈 보고서"
+      ></iframe>
     </article>
   `;
   resultsEl.classList.remove('hidden');
