@@ -28,19 +28,25 @@ uvicorn main:app --reload --port 8000
 
 브라우저에서 **http://localhost:8000** 접속
 
-## 이메일 설정
+## 이메일 설정 (Gmail)
 
-`backend/.env` 파일 예시:
+자세한 설정: [backend/GMAIL_SETUP.md](backend/GMAIL_SETUP.md)
+
+```bash
+cd backend
+copy .env.example .env
+# .env 에 Gmail 주소와 앱 비밀번호 입력
+```
 
 ```env
 SMTP_HOST=smtp.gmail.com
 SMTP_PORT=587
 SMTP_USER=your-email@gmail.com
-SMTP_PASSWORD=your-app-password
+SMTP_PASSWORD=your-16-digit-app-password
 SMTP_FROM=your-email@gmail.com
 ```
 
-Gmail 사용 시 [앱 비밀번호](https://myaccount.google.com/apppasswords)를 생성해 `SMTP_PASSWORD`에 입력하세요.
+[Gmail 앱 비밀번호](https://myaccount.google.com/apppasswords) 생성 후 `SMTP_PASSWORD`에 입력 (2단계 인증 필요).
 
 ## API
 

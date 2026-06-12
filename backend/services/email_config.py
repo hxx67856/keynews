@@ -16,8 +16,8 @@ def is_email_configured() -> bool:
 
 def email_setup_hint() -> str:
     if is_email_configured():
-        return "이메일 발송 준비 완료"
+        return "Gmail 발송 준비 완료"
     return (
-        "이메일 발송을 사용하려면 backend/.env 파일에 SMTP 설정을 추가하고 서버를 재시작하세요. "
-        "(.env.example 참고)"
+        "Gmail 설정: backend/.env 에 SMTP_USER·SMTP_PASSWORD(앱 비밀번호)를 입력하고 서버를 재시작하세요. "
+        "앱 비밀번호 → https://myaccount.google.com/apppasswords"
     )
