@@ -9,9 +9,11 @@ const examplesEl = $('#examples');
 const alertEl = $('#alert');
 const loadingEl = $('#loading');
 const resultsEl = $('#results');
+const emailHintEl = $('#email-hint');
 
 let currentKeyword = '';
 let currentReportId = '';
+let emailConfigured = false;
 
 function showAlert(message, type = 'error') {
   alertEl.textContent = message;
@@ -34,6 +36,27 @@ function escapeHtml(text) {
   const div = document.createElement('div');
   div.textContent = text;
   return div.innerHTML;
+}
+
+async function fetchEmailStatus() {
+  try {
+    const res = await fetch('/api/email/status');
+    const data = await res.json();
+    emailConfigured = Boolean(data.configured);
+    if (!emailHintEl) return;
+    if (emailConfigured) {
+      emailHintEl.classList.add('hidden');
+      emailBtn.disabled = false;
+    } else {
+      emailHintEl.textContent = data.message || 'SMTP 설정이 필요합니다. backend/.env 파일을 확인하세요.';
+      emailHintEl.classList.remove('hidden');
+    }
+  } catch {
+    if (emailHintEl) {
+      emailHintEl.textContent = '이메일 설정 상태를 확인하지 못했습니다.';
+      emailHintEl.classList.remove('hidden');
+    }
+  }
 }
 
 async function fetchExamples() {
@@ -129,6 +152,11 @@ async function doSearch(keyword) {
 }
 
 async function doSendEmail() {
+  if (!emailConfigured) {
+    showAlert('이메일 발송이 설정되지 않았습니다. backend/.env에 SMTP 정보를 입력하고 서버를 재시작하세요.');
+    return;
+  }
+
   const term = currentKeyword || keywordInput.value.trim();
   const email = emailInput.value.trim();
 
@@ -170,3 +198,4 @@ searchForm.addEventListener('submit', (e) => {
 emailBtn.addEventListener('click', doSendEmail);
 
 fetchExamples();
+fetchEmailStatus();

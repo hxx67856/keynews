@@ -14,6 +14,7 @@ from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, EmailStr, Field
 
+from services.email_config import email_setup_hint, is_email_configured
 from services.email_sender import send_report_email
 from services.news_collector import collect_issues
 from services.report_store import create_report, get_report_file_path, get_report_meta
@@ -68,6 +69,15 @@ async def health() -> dict[str, str]:
 @app.get("/api/examples")
 async def examples() -> dict[str, list[str]]:
     return {"keywords": EXAMPLE_KEYWORDS}
+
+
+@app.get("/api/email/status")
+async def email_status() -> dict[str, str | bool]:
+    configured = is_email_configured()
+    return {
+        "configured": configured,
+        "message": email_setup_hint(),
+    }
 
 
 @app.post("/api/search")
