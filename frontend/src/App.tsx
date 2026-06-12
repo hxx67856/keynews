@@ -74,7 +74,7 @@ export default function App() {
     setSuccess(null)
 
     try {
-      const msg = await sendReportEmail(term, addr)
+      const msg = await sendReportEmail(term, addr, result?.report_id)
       setSuccess(msg)
     } catch (err) {
       setError(err instanceof Error ? err.message : '이메일 발송에 실패했습니다.')
@@ -132,7 +132,7 @@ export default function App() {
                   aria-label="검색 키워드"
                 />
                 <button type="submit" className="btn-primary" disabled={loading}>
-                  {loading ? '수집 중...' : '이슈 검색'}
+                  {loading ? '보고서 생성 중...' : '이슈 검색'}
                 </button>
               </div>
             </form>
@@ -180,7 +180,7 @@ export default function App() {
         {loading && (
           <div className="loading">
             <div className="spinner" />
-            <p>최근 7일 뉴스를 수집하고 있습니다...</p>
+            <p>최근 7일 뉴스를 수집하고 보고서를 생성하고 있습니다...</p>
           </div>
         )}
 
@@ -192,6 +192,19 @@ export default function App() {
               <span className="badge-tag badge-tag-orange">최근 {result.period_days}일</span>
               <span className="badge-tag badge-tag-sky">{result.generated_at}</span>
             </div>
+
+            <article className="card-base report-ready">
+              <p className="card-label">보고서 생성 완료</p>
+              <p className="overview-text">「{result.keyword}」 이슈 보고서가 자동 생성되었습니다.</p>
+              <div className="report-actions">
+                <a className="btn-primary report-action-btn" href={result.report_url} target="_blank" rel="noopener noreferrer">
+                  보고서 보기
+                </a>
+                <a className="btn-secondary report-action-btn" href={result.report_download_url} download>
+                  HTML 다운로드
+                </a>
+              </div>
+            </article>
 
             <article className="card-yellow-bold">
               <p className="card-label">세 줄 요약</p>

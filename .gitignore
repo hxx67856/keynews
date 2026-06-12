@@ -25,3 +25,6 @@ Thumbs.db
 _test_out.json
 _api.json
 _t.json
+
+# Generated reports
+backend/reports/

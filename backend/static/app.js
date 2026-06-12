@@ -13,6 +13,7 @@ const resultsEl = $('#results');
 const TINT_CLASSES = ['tint-peach', 'tint-rose', 'tint-mint', 'tint-lavender', 'tint-sky', 'tint-yellow'];
 
 let currentKeyword = '';
+let currentReportId = '';
 
 function showAlert(message, type = 'error') {
   alertEl.textContent = message;
@@ -28,7 +29,7 @@ function setLoading(on) {
   loadingEl.classList.toggle('hidden', !on);
   searchBtn.disabled = on;
   emailBtn.disabled = on;
-  searchBtn.textContent = on ? '수집 중...' : '이슈 검색';
+  searchBtn.textContent = on ? '보고서 생성 중...' : '이슈 검색';
 }
 
 function escapeHtml(text) {
@@ -105,6 +106,15 @@ function renderResults(data) {
       <span class="badge-tag badge-tag-sky">${escapeHtml(data.generated_at)}</span>
     </div>
 
+    <article class="card-base report-ready">
+      <p class="card-label">보고서 생성 완료</p>
+      <p class="overview-text">「${escapeHtml(data.keyword)}」 이슈 보고서가 자동 생성되었습니다.</p>
+      <div class="report-actions">
+        <a class="btn-primary report-action-btn" href="${escapeHtml(data.report_url)}" target="_blank" rel="noopener noreferrer">보고서 보기</a>
+        <a class="btn-secondary report-action-btn" href="${escapeHtml(data.report_download_url)}" download>HTML 다운로드</a>
+      </div>
+    </article>
+
     <article class="card-yellow-bold">
       <p class="card-label">세 줄 요약</p>
       <ol class="three-line-summary">${summaryLines}</ol>
@@ -149,6 +159,7 @@ async function doSearch(keyword) {
     });
     const data = await res.json();
     if (!res.ok) throw new Error(data.detail || '검색에 실패했습니다.');
+    currentReportId = data.report_id || '';
     renderResults(data);
     document.getElementById('results')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   } catch (err) {
@@ -179,7 +190,7 @@ async function doSendEmail() {
     const res = await fetch('/api/send-email', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ keyword: term, email }),
+      body: JSON.stringify({ keyword: term, email, report_id: currentReportId || null }),
     });
     const data = await res.json();
     if (!res.ok) throw new Error(data.detail || '이메일 발송에 실패했습니다.');

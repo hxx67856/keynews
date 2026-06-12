@@ -26,6 +26,9 @@ export interface SearchResult {
   period_days: number
   generated_at: string
   item_count: number
+  report_id: string
+  report_url: string
+  report_download_url: string
   three_line_summary: string[]
   overview: string
   highlights: Highlight[]
@@ -50,11 +53,11 @@ export async function searchKeyword(keyword: string): Promise<SearchResult> {
   return data
 }
 
-export async function sendReportEmail(keyword: string, email: string): Promise<string> {
+export async function sendReportEmail(keyword: string, email: string, reportId?: string): Promise<string> {
   const res = await fetch('/api/send-email', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ keyword, email }),
+    body: JSON.stringify({ keyword, email, report_id: reportId || null }),
   })
   const data = await res.json()
   if (!res.ok) throw new Error(data.detail ?? '이메일 발송에 실패했습니다.')
