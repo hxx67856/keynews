@@ -1,9 +1,6 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "framework": null,
-  "installCommand": "",
-  "buildCommand": "mkdir -p public/static && cp backend/static/index.html public/ && cp backend/static/*.css backend/static/*.js public/static/",
-  "outputDirectory": "public",
   "rewrites": [
     { "source": "/api/chat/status", "destination": "/api/chat" },
     { "source": "/api/chat", "destination": "/api/chat" }

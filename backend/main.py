@@ -24,7 +24,9 @@ from services.summarizer import build_report
 load_dotenv()
 
 KST = timezone(timedelta(hours=9))
-STATIC_DIR = Path(__file__).parent / "static"
+PROJECT_ROOT = Path(__file__).resolve().parent.parent
+PUBLIC_DIR = PROJECT_ROOT / "public"
+STATIC_DIR = PUBLIC_DIR / "static"
 
 EXAMPLE_KEYWORDS = [
     "인공지능 규제",
@@ -70,7 +72,7 @@ class ChatRequest(BaseModel):
 
 @app.get("/")
 async def index() -> FileResponse:
-    return FileResponse(STATIC_DIR / "index.html")
+    return FileResponse(PUBLIC_DIR / "index.html")
 
 
 @app.get("/api/health")

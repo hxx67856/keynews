@@ -73,15 +73,11 @@ GitHub `keynews` 저장소를 연결한 뒤 **Settings → General**에서:
 |------|-----|
 | **Root Directory** | *(비워 두기 — 저장소 루트)* |
 | **Framework Preset** | **Other** |
-| **Build Command** | *(vercel.json 사용 — 아래 명령)* |
-| **Output Directory** | `public` |
+| **Build Command** | *(비워 두기 — 빌드 불필요)* |
+| **Output Directory** | *(비워 두기 — `public/` 자동 사용)* |
 | **Install Command** | *(비워 두기)* |
 
-`vercel.json`의 Build Command:
-
-```bash
-mkdir -p public/static && cp backend/static/index.html public/ && cp backend/static/*.css backend/static/*.js public/static/
-```
+정적 파일은 저장소 루트의 `public/` 폴더에 있습니다. Vercel이 빌드 없이 자동 배포합니다.
 
 > Root Directory가 `frontend`로 되어 있으면 Vite `npm run build`가 실행되며 **실패**합니다. 반드시 **루트(`.`)** 로 두세요.
 
@@ -98,7 +94,7 @@ vercel
 # 또는 GitHub push 시 자동 배포
 ```
 
-- 정적 UI: `backend/static` → `public/` 복사 (Vite/npm 빌드 없음)
+- 정적 UI: `public/` (빌드 없이 Git에 포함)
 - 챗봇 API: `api/chat.py` (서버리스)
 
 > Vercel 배포본에서는 **챗봇 + 정적 UI**만 동작합니다. 뉴스 검색·이메일은 로컬 FastAPI 서버에서 사용하세요.
@@ -119,12 +115,14 @@ vercel
 issue-report-app/
 ├── backend/
 │   ├── main.py                 # FastAPI 서버 + 웹 UI 제공
-│   ├── static/                 # HTML/CSS/JS 프론트엔드
 │   └── services/
 │       ├── news_collector.py   # Google News RSS 수집
 │       ├── summarizer.py       # 한 줄 요약·핵심 정리
 │       ├── gemini_chat.py      # Gemini AI 챗봇
 │       └── email_sender.py     # HTML 이메일 발송
+├── public/                     # HTML/CSS/JS (Vercel + 로컬 공용)
+│   ├── index.html
+│   └── static/
 ├── api/
 │   └── chat.py                 # Vercel 서버리스 챗봇
 └── frontend/                   # (선택) React + Vite 버전
