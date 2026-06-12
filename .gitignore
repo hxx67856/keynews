@@ -12,6 +12,7 @@ backend/.env
 # Node
 frontend/node_modules/
 frontend/dist/
+public/
 *.log
 
 # OS / IDE

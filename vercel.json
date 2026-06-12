@@ -1,13 +1,11 @@
 {
-  "version": 2,
-  "builds": [
-    { "src": "api/chat.py", "use": "@vercel/python" },
-    { "src": "backend/static/**", "use": "@vercel/static" }
-  ],
-  "routes": [
-    { "src": "/api/chat", "dest": "/api/chat.py" },
-    { "src": "/api/chat/status", "dest": "/api/chat.py" },
-    { "src": "/static/(.*)", "dest": "/backend/static/$1" },
-    { "src": "/(.*)", "dest": "/backend/static/index.html" }
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": null,
+  "installCommand": "",
+  "buildCommand": "mkdir -p public/static && cp backend/static/index.html public/ && cp backend/static/*.css backend/static/*.js public/static/",
+  "outputDirectory": "public",
+  "rewrites": [
+    { "source": "/api/chat/status", "destination": "/api/chat" },
+    { "source": "/api/chat", "destination": "/api/chat" }
   ]
 }

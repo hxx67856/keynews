@@ -65,16 +65,43 @@ GEMINI_API_KEY=your-gemini-api-key
 
 ## Vercel 배포
 
+### 1. Vercel 프로젝트 설정 (중요)
+
+GitHub `keynews` 저장소를 연결한 뒤 **Settings → General**에서:
+
+| 항목 | 값 |
+|------|-----|
+| **Root Directory** | *(비워 두기 — 저장소 루트)* |
+| **Framework Preset** | **Other** |
+| **Build Command** | *(vercel.json 사용 — 아래 명령)* |
+| **Output Directory** | `public` |
+| **Install Command** | *(비워 두기)* |
+
+`vercel.json`의 Build Command:
+
 ```bash
-# Vercel CLI 또는 GitHub 연동
-vercel
+mkdir -p public/static && cp backend/static/index.html public/ && cp backend/static/*.css backend/static/*.js public/static/
 ```
 
-- 정적 UI: `backend/static/`
-- 챗봇 API: `api/chat.py` (서버리스)
-- 환경 변수: `GEMINI_API_KEY` (필수)
+> Root Directory가 `frontend`로 되어 있으면 Vite `npm run build`가 실행되며 **실패**합니다. 반드시 **루트(`.`)** 로 두세요.
 
-> Vercel 배포본에서는 뉴스 검색·이메일 등 FastAPI 백엔드 기능은 포함되지 않습니다. 전체 기능은 로컬 FastAPI 서버에서 사용하세요.
+### 2. 환경 변수
+
+Settings → Environment Variables:
+
+- `GEMINI_API_KEY` — Gemini API 키
+
+### 3. 배포
+
+```bash
+vercel
+# 또는 GitHub push 시 자동 배포
+```
+
+- 정적 UI: `backend/static` → `public/` 복사 (Vite/npm 빌드 없음)
+- 챗봇 API: `api/chat.py` (서버리스)
+
+> Vercel 배포본에서는 **챗봇 + 정적 UI**만 동작합니다. 뉴스 검색·이메일은 로컬 FastAPI 서버에서 사용하세요.
 
 ## API
 
