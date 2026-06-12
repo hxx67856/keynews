@@ -13,7 +13,11 @@ const emailHintEl = $('#email-hint');
 
 let currentKeyword = '';
 let currentReportId = '';
+let currentReportContext = '';
 let emailConfigured = false;
+
+window.issueBriefingKeyword = '';
+window.issueBriefingReportContext = '';
 
 function showAlert(message, type = 'error') {
   alertEl.textContent = message;
@@ -142,6 +146,16 @@ async function doSearch(keyword) {
     const data = await res.json();
     if (!res.ok) throw new Error(data.detail || '검색에 실패했습니다.');
     currentReportId = data.report_id || '';
+    const contextParts = [];
+    if (Array.isArray(data.three_line_summary) && data.three_line_summary.length) {
+      contextParts.push(data.three_line_summary.join('\n'));
+    }
+    if (data.overview) {
+      contextParts.push(data.overview);
+    }
+    currentReportContext = contextParts.join('\n\n');
+    window.issueBriefingKeyword = currentKeyword;
+    window.issueBriefingReportContext = currentReportContext;
     renderResults(data);
     document.getElementById('results')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   } catch (err) {

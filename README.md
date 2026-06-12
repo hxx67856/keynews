@@ -9,6 +9,7 @@
 - **한 줄 요약** + 핵심 개요 + 주요 이슈 하이라이트
 - **출처 명시** (매체, 게시일, 원문 링크)
 - HTML 보고서 **이메일 발송**
+- **AI 챗봇** (Gemini 2.5 Flash Lite) — 검색·보고서 해석, 사용법 안내
 
 ## 실행 방법 (Python만 필요)
 
@@ -48,6 +49,33 @@ SMTP_FROM=your-email@gmail.com
 
 [Gmail 앱 비밀번호](https://myaccount.google.com/apppasswords) 생성 후 `SMTP_PASSWORD`에 입력 (2단계 인증 필요).
 
+## AI 챗봇 (Gemini)
+
+모델: `gemini-2.5-flash-lite`
+
+로컬 개발 시 `backend/.env`에 API 키 추가:
+
+```env
+GEMINI_API_KEY=your-gemini-api-key
+```
+
+**Vercel 배포** 시 프로젝트 설정 → Environment Variables에 `GEMINI_API_KEY`를 추가하세요.
+
+화면 우하단 **채팅 버튼**으로 AI 어시스턴트를 열 수 있습니다. 검색 후 생성된 보고서 요약을 컨텍스트로 활용합니다.
+
+## Vercel 배포
+
+```bash
+# Vercel CLI 또는 GitHub 연동
+vercel
+```
+
+- 정적 UI: `backend/static/`
+- 챗봇 API: `api/chat.py` (서버리스)
+- 환경 변수: `GEMINI_API_KEY` (필수)
+
+> Vercel 배포본에서는 뉴스 검색·이메일 등 FastAPI 백엔드 기능은 포함되지 않습니다. 전체 기능은 로컬 FastAPI 서버에서 사용하세요.
+
 ## API
 
 | Method | Path | 설명 |
@@ -55,6 +83,8 @@ SMTP_FROM=your-email@gmail.com
 | GET | `/api/examples` | 예시 키워드 목록 |
 | POST | `/api/search` | `{ "keyword": "..." }` — 이슈 수집 및 보고서 생성 |
 | POST | `/api/send-email` | `{ "keyword": "...", "email": "..." }` — 이메일 발송 |
+| GET | `/api/chat/status` | Gemini API 키 설정 여부 |
+| POST | `/api/chat` | `{ "messages": [...], "keyword": "...", "report_context": "..." }` — AI 챗봇 |
 
 ## 프로젝트 구조
 
@@ -66,7 +96,10 @@ issue-report-app/
 │   └── services/
 │       ├── news_collector.py   # Google News RSS 수집
 │       ├── summarizer.py       # 한 줄 요약·핵심 정리
+│       ├── gemini_chat.py      # Gemini AI 챗봇
 │       └── email_sender.py     # HTML 이메일 발송
+├── api/
+│   └── chat.py                 # Vercel 서버리스 챗봇
 └── frontend/                   # (선택) React + Vite 버전
 ```
 

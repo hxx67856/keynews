@@ -16,6 +16,7 @@ from pydantic import BaseModel, EmailStr, Field
 
 from services.email_config import email_setup_hint, is_email_configured
 from services.email_sender import send_report_email, verify_smtp_login
+from services.gemini_chat import GEMINI_MODEL, generate_chat_reply, is_gemini_configured
 from services.news_collector import collect_issues
 from services.report_store import create_report, get_report_file_path, get_report_meta
 from services.summarizer import build_report
@@ -56,6 +57,17 @@ class EmailRequest(BaseModel):
     report_id: str | None = None
 
 
+class ChatMessage(BaseModel):
+    role: str = Field(..., pattern="^(user|model)$")
+    content: str = Field(..., min_length=1, max_length=4000)
+
+
+class ChatRequest(BaseModel):
+    messages: list[ChatMessage] = Field(..., min_length=1)
+    keyword: str | None = None
+    report_context: str | None = None
+
+
 @app.get("/")
 async def index() -> FileResponse:
     return FileResponse(STATIC_DIR / "index.html")
@@ -89,6 +101,29 @@ async def email_test() -> dict[str, str]:
     except Exception as exc:
         raise HTTPException(status_code=502, detail=f"SMTP 연결 실패: {exc}") from exc
     return {"message": "Gmail SMTP 인증 성공. 이메일 발송을 사용할 수 있습니다."}
+
+
+@app.get("/api/chat/status")
+async def chat_status() -> dict[str, str | bool]:
+    return {
+        "configured": is_gemini_configured(),
+        "model": GEMINI_MODEL,
+    }
+
+
+@app.post("/api/chat")
+async def chat(req: ChatRequest) -> dict[str, str]:
+    try:
+        reply = await generate_chat_reply(
+            [m.model_dump() for m in req.messages],
+            keyword=req.keyword,
+            report_context=req.report_context,
+        )
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    except Exception as exc:
+        raise HTTPException(status_code=502, detail=f"챗봇 오류: {exc}") from exc
+    return {"reply": reply, "model": GEMINI_MODEL}
 
 
 @app.post("/api/search")

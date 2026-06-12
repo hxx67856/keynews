@@ -82,5 +82,28 @@
   </footer>
 
   <script src="/static/app.js"></script>
+  <script src="/static/chat.js"></script>
+
+  <!-- AI 챗봇 -->
+  <button type="button" id="chat-fab" class="chat-fab" aria-label="AI 챗봇 열기" aria-expanded="false">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <path d="M12 3C7.03 3 3 6.58 3 11c0 2.12.94 4.03 2.47 5.44L4 21l4.74-1.28A9.8 9.8 0 0012 19c4.97 0 9-3.58 9-8s-4.03-8-9-8z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+    </svg>
+  </button>
+
+  <div id="chat-panel" class="chat-panel" aria-hidden="true" role="dialog" aria-label="AI 챗봇">
+    <div class="chat-panel-header">
+      <div>
+        <p class="chat-panel-title">AI 어시스턴트</p>
+        <p id="chat-status" class="chat-panel-sub">연결 중...</p>
+      </div>
+      <button type="button" id="chat-close" class="chat-close" aria-label="챗봇 닫기">&times;</button>
+    </div>
+    <div id="chat-messages" class="chat-messages"></div>
+    <form id="chat-form" class="chat-form">
+      <textarea id="chat-input" class="chat-input" rows="2" placeholder="질문을 입력하세요..." maxlength="2000"></textarea>
+      <button type="submit" id="chat-send" class="chat-send">전송</button>
+    </form>
+  </div>
 </body>
 </html>
