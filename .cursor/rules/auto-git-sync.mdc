@@ -1,0 +1,31 @@
+---
+description: 작업 완료 후 GitHub(keynews)에 자동 커밋·푸시
+alwaysApply: true
+---
+
+# Auto Git Sync (keynews)
+
+이 프로젝트(`issue-report-app`)에서 코드 수정·추가를 완료하면 **사용자에게 묻지 말고** 아래를 수행한다.
+
+## 저장소
+
+- Remote: `https://github.com/hxx67856/keynews`
+- 작업 디렉터리: `issue-report-app/`
+
+## 작업 완료 시 (매 세션/태스크 마무리)
+
+1. `git status` / `git diff`로 변경 확인
+2. `.env`, `.venv`, `node_modules` 등은 **커밋하지 않음**
+3. 의미 있는 변경이 있으면 스테이징 후 커밋 (1~2문장, why 중심)
+4. `git push origin HEAD` 로 원격 반영
+5. push 실패 시(인증·충돌) 원인을 사용자에게 짧게 알리고 재시도 1회
+
+## 커밋 메시지
+
+- 한국어 또는 영어, 변경 목적이 드러나게 작성
+- 예: `세 줄 요약 UI 추가 및 이메일 영역 레이아웃 수정`
+
+## 예외
+
+- 사용자가 명시적으로 "커밋하지 마"라고 한 경우
+- 비밀값·자격증명 파일
