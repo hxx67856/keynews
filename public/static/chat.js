@@ -43,10 +43,19 @@
     chatSend.textContent = on ? '전송 중...' : '전송';
   }
 
+  async function parseJsonResponse(res) {
+    const text = await res.text();
+    try {
+      return JSON.parse(text);
+    } catch {
+      throw new Error('챗봇 API 응답을 해석할 수 없습니다.');
+    }
+  }
+
   async function fetchChatStatus() {
     try {
       const res = await fetch('/api/chat/status');
-      const data = await res.json();
+      const data = await parseJsonResponse(res);
       chatConfigured = Boolean(data.configured);
       if (chatStatus) {
         chatStatus.textContent = chatConfigured
@@ -104,7 +113,7 @@
           report_context: window.issueBriefingReportContext || null,
         }),
       });
-      const data = await res.json();
+      const data = await parseJsonResponse(res);
       if (!res.ok) throw new Error(data.detail || '응답을 받지 못했습니다.');
 
       const reply = data.reply || '';

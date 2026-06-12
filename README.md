@@ -123,11 +123,12 @@ issue-report-app/
 ├── public/                     # HTML/CSS/JS (Vercel + 로컬 공용)
 │   ├── index.html
 │   └── static/
+├── lib/                        # Vercel API 공용 로직 (Node.js)
 ├── api/
-│   ├── search.py               # Vercel 이슈 검색
-│   ├── examples.py             # Vercel 예시 키워드
-│   ├── chat.py                 # Vercel AI 챗봇
-│   └── email/status.py         # Vercel 이메일 상태 (미지원 안내)
+│   ├── search.js               # Vercel 이슈 검색
+│   ├── examples.js             # Vercel 예시 키워드
+│   ├── chat.js                 # Vercel AI 챗봇
+│   └── email/status.js         # Vercel 이메일 상태 (미지원 안내)
 └── frontend/                   # (선택) React + Vite 버전
 ```
 

@@ -1,13 +1,15 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "framework": null,
+  "installCommand": "",
+  "buildCommand": "",
   "functions": {
-    "api/search.py": {
+    "api/search.js": {
       "maxDuration": 60
     }
   },
   "rewrites": [
-    { "source": "/api/chat/status", "destination": "/api/chat" },
+    { "source": "/api/chat/status", "destination": "/api/chat?status=1" },
     { "source": "/api/chat", "destination": "/api/chat" }
   ]
 }

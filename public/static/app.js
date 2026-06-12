@@ -43,10 +43,23 @@ function escapeHtml(text) {
   return div.innerHTML;
 }
 
+async function parseJsonResponse(res) {
+  const text = await res.text();
+  try {
+    return JSON.parse(text);
+  } catch {
+    const preview = text.trim().slice(0, 80);
+    if (preview.startsWith('The page') || preview.startsWith('<!')) {
+      throw new Error('API를 찾을 수 없습니다. Vercel 재배포 후 다시 시도해 주세요.');
+    }
+    throw new Error(preview || '서버 응답을 해석할 수 없습니다.');
+  }
+}
+
 async function fetchEmailStatus() {
   try {
     const res = await fetch('/api/email/status');
-    const data = await res.json();
+    const data = await parseJsonResponse(res);
     emailConfigured = Boolean(data.configured);
     if (!emailHintEl) return;
     if (emailConfigured) {
@@ -69,7 +82,7 @@ async function fetchEmailStatus() {
 async function fetchExamples() {
   try {
     const res = await fetch('/api/examples');
-    const data = await res.json();
+    const data = await parseJsonResponse(res);
     renderExamples(data.keywords);
   } catch {
     renderExamples([
@@ -180,7 +193,7 @@ async function doSearch(keyword) {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ keyword: term }),
     });
-    const data = await res.json();
+    const data = await parseJsonResponse(res);
     if (!res.ok) throw new Error(data.detail || '검색에 실패했습니다.');
     currentReportId = data.report_id || '';
     const contextParts = [];
@@ -230,7 +243,7 @@ async function doSendEmail() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ keyword: term, email, report_id: currentReportId || null }),
     });
-    const data = await res.json();
+    const data = await parseJsonResponse(res);
     if (!res.ok) throw new Error(data.detail || '이메일 발송에 실패했습니다.');
     showAlert(data.message, 'success');
   } catch (err) {
